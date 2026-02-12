@@ -104,16 +104,13 @@ workspace/knowledge/
         coding-style.md
         communication.md
 
-    concepts/
-        context-windowing.md
-        agent-architecture.md
+    projects/
+        nanobot-knowledge-base.md
+        dashboard-redesign.md
 
     references/
-        useful-apis.md
-        documentation-links.md
-
-    insights/
-        ...
+        godel-escher-bach.md
+        clean-architecture.md
 ```
 
 **Why filesystem:**
@@ -132,7 +129,7 @@ Each knowledge file follows a consistent template with YAML frontmatter for meta
 type: decision
 created: 2024-03-15
 updated: 2024-06-01
-related: [topics/nanobot-architecture, concepts/agent-architecture]
+related: [topics/nanobot-architecture, topics/agent-architecture]
 tags: [architecture, providers, llm]
 ---
 # Use LiteLLM as Provider Abstraction
@@ -183,7 +180,7 @@ Address the JSONL dead-data problem by processing conversations before they fall
 
 1. **Trigger** — cron job, message count threshold, or end-of-day schedule
 2. **Subagent** (running on a local model like Ollama) reads the JSONL session file in chunks via a dedicated `session_reader` tool
-3. **Extracts** topics, decisions, facts, preferences, people, references
+3. **Extracts** topics, decisions, facts, preferences, people, projects, references
 4. **Creates or updates** knowledge files in the appropriate categories
 5. **Updates** `INDEX.md` with new entries
 6. **Optionally truncates** the processed portion of the JSONL file

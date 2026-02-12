@@ -22,9 +22,8 @@ workspace/knowledge/
     decisions/
     facts/
     preferences/
-    concepts/
+    projects/
     references/
-    insights/
 ```
 
 Create empty subdirectories and a seed `INDEX.md`:
@@ -44,11 +43,9 @@ Last updated: YYYY-MM-DD
 
 ## Preferences
 
-## Concepts
+## Projects
 
 ## References
-
-## Insights
 ```
 
 ### 1.2 Define the entity file template
@@ -57,7 +54,7 @@ Create `workspace/knowledge/TEMPLATE.md` as a reference:
 
 ```markdown
 ---
-type: topic|person|decision|fact|preference|concept|reference|insight
+type: topic|person|decision|fact|preference|project|reference
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 related: []
@@ -93,7 +90,7 @@ The knowledge base is at `workspace/knowledge/`.
 
 ## Structure
 - `INDEX.md` — master index, always loaded in context. Keep entries to one line each.
-- Subdirectories by type: topics/, people/, decisions/, facts/, preferences/, concepts/, references/, insights/
+- Subdirectories by type: topics/, people/, decisions/, facts/, preferences/, projects/, references/
 - Each entity is a markdown file with YAML frontmatter (type, created, updated, related, tags)
 
 ## When to Create Knowledge Entries

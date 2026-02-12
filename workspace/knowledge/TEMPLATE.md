@@ -1,5 +1,5 @@
 ---
-type: topic|person|decision|fact|preference|concept|reference|insight
+type: topic|person|decision|fact|preference|project|reference
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 related: []

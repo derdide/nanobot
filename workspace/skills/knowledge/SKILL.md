@@ -15,14 +15,13 @@ It is the agent's long-term, topic-organized memory — complementing the flat `
 workspace/knowledge/
     INDEX.md          <- master index, loaded every turn in system prompt
     TEMPLATE.md       <- reference template for new entries
-    topics/           <- subjects discussed in depth
+    topics/           <- subjects discussed in depth (includes concepts, ideas, frameworks)
     people/           <- individuals with context and relationship
-    decisions/        <- choices made, with rationale and alternatives
-    facts/            <- concrete information worth remembering
+    decisions/        <- choices made with rationale, insights, and lessons learned
+    facts/            <- concrete, stable information worth remembering
     preferences/      <- user preferences for tools, styles, approaches
-    concepts/         <- ideas, frameworks, mental models
-    references/       <- useful links, documentation, APIs
-    insights/         <- observations, patterns, lessons learned
+    projects/         <- ongoing work spanning multiple entities
+    references/       <- books, articles, laws, theorems, films, music, art, websites
 ```
 
 ## INDEX.md
@@ -74,7 +73,7 @@ Full content here.
 ```
 
 ### Frontmatter Fields
-- `type`: One of: topic, person, decision, fact, preference, concept, reference, insight
+- `type`: One of: topic, person, decision, fact, preference, project, reference
 - `created`: Date of creation (YYYY-MM-DD)
 - `updated`: Date of last meaningful update (YYYY-MM-DD)
 - `related`: List of paths to related entries (relative to knowledge/)
@@ -86,14 +85,13 @@ The `related` field links entries together. When exploring a topic, follow relat
 ## When to Create or Update Entries
 
 Create entries when conversations involve:
-- A topic discussed in depth or repeatedly
-- A person mentioned with meaningful context
-- A decision made with reasoning
-- A concrete fact worth retaining (configurations, setups, accounts)
-- A user preference expressed (coding style, communication, tools)
-- A concept or framework explored
-- A useful reference or link
-- An insight or lesson learned
+- **Topics**: A subject discussed in depth or repeatedly (includes concepts, ideas, frameworks)
+- **People**: A person mentioned with meaningful context
+- **Decisions**: A choice made with reasoning, an insight, or a lesson learned
+- **Facts**: Concrete, stable information worth retaining (configurations, setups, accounts)
+- **Preferences**: A user preference expressed (coding style, communication, tools)
+- **Projects**: Ongoing work that spans multiple topics, people, or decisions
+- **References**: A book, article, law, theorem, film, piece of music, artwork, or notable website
 
 Update entries when:
 - New information adds to or changes existing knowledge
