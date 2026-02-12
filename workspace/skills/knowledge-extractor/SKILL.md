@@ -1,93 +1,94 @@
 ---
 name: knowledge-extractor
-description: Extract knowledge from conversation history and populate the knowledge base.
+description: Extract knowledge from conversation history and populate the knowledge base, memory, and daily notes.
 metadata: {"nanobot":{"emoji":"🔍"}}
 ---
 
 # Knowledge Extractor
 
-This skill is used to process conversation history and extract structured knowledge into the knowledge base.
-It is typically run as a subagent task spawned by the main agent.
+Process conversation history and extract structured information into three outputs:
+- **Knowledge base** (`workspace/knowledge/`) — structured, topic-organized entries
+- **Long-term memory** (`workspace/memory/MEMORY.md`) — critical quick-access facts
+- **Daily notes** (`workspace/memory/YYYY-MM-DD.md`) — date-specific summaries
 
-## Overview
+This skill is typically run as a subagent task spawned by the main agent.
 
-The knowledge base at `workspace/knowledge/` stores structured information extracted from conversations.
-This skill describes how to process conversation history (via the `session_reader` tool) and create or update knowledge entries.
+## Prerequisites
+
+Before extracting knowledge, read the knowledge management skill for conventions on file format, categories, and cross-references:
+```
+read_file(path="workspace/skills/knowledge/SKILL.md")
+```
+
+All knowledge entries must follow the conventions defined there.
 
 ## Processing Workflow
 
-### Step 1: Check processing state
+### Step 1: Read prerequisites
+
+Read the knowledge skill to understand entry format and categories:
+```
+read_file(path="workspace/skills/knowledge/SKILL.md")
+```
+
+### Step 2: Check processing state
 
 Read the processing state file to know where to resume:
 ```
 read_file(path="workspace/knowledge/.processing-state.json")
 ```
 
-If the file doesn't exist, start from offset 0.
+If the file doesn't exist or the session is not listed, start from offset 0.
 
-### Step 2: Get session stats
+### Step 3: Get session stats
 
 ```
 session_reader(action="stats", session_key="<key>")
 ```
 
-This tells you total message count so you know how much work there is.
+This tells you total message count so you know how much to process.
 
-### Step 3: Read a chunk of messages
+### Step 4: Read a chunk of messages
 
 ```
 session_reader(action="read", session_key="<key>", offset=<last_offset>, limit=50)
 ```
 
-Process in chunks of 50 messages. Only user and assistant messages are included by default (tool calls are filtered out).
+Process in chunks of 50 messages. Only user and assistant messages are included by default.
 
-### Step 4: Extract knowledge
+### Step 5: Extract and write
 
-For each chunk, identify:
+For each chunk, extract information and write to the appropriate outputs:
 
-- **Topics**: Subjects discussed in depth (includes concepts, ideas, frameworks)
-- **People**: Individuals mentioned with meaningful context
-- **Decisions**: Choices made with reasoning, insights, or lessons learned
-- **Facts**: Concrete, stable information (configurations, setups, accounts)
-- **Preferences**: User preferences for tools, styles, approaches
-- **Projects**: Ongoing work spanning multiple entities
-- **References**: Books, articles, laws, theorems, films, music, art, websites
+**Knowledge base entries** — for topics, people, decisions, facts, preferences, projects, and references that deserve structured, standalone entries. Follow the conventions in the knowledge skill.
 
-### Step 5: Check existing entries
+Before creating a new entry:
+1. Read `workspace/knowledge/INDEX.md` to check if an entry already exists
+2. If it does, read the full file and update it rather than creating a duplicate
+3. After creating or updating, update `INDEX.md`
 
-Read `workspace/knowledge/INDEX.md` to see what already exists.
-If an entry already exists for a topic, read the full file and update it rather than creating a duplicate.
+**Long-term memory** — for critical facts the agent should always have quick access to:
+- User identity and context (name, role, location, timezone)
+- Key configuration details (server IPs, account names, API endpoints)
+- Standing instructions or preferences that apply broadly
+- Append to or update `workspace/memory/MEMORY.md`
+- Keep this file concise — it's loaded every turn
 
-### Step 6: Create or update entries
+**Daily notes** — for date-specific summaries of what happened:
+- Key conversations and their outcomes
+- Tasks completed or started
+- Decisions made on that date
+- Write to `workspace/memory/YYYY-MM-DD.md` using the date from the messages
+- Group by the actual date of the conversation, not today's date
 
-For new entries:
-1. Create the file in the appropriate subdirectory with YAML frontmatter
-2. Use kebab-case filenames: `docker-compose-setup.md`
-3. Include `type`, `created`, `updated`, `related`, and `tags` in frontmatter
-4. Add a one-line summary to `INDEX.md`
-
-For existing entries:
-1. Read the current file
-2. Merge new information
-3. Update the `updated` date
-4. Add a dated line to the Evolution section
-5. Update cross-references in `related` field
-6. Update `INDEX.md` summary if changed
-
-### Step 7: Update processing state
+### Step 6: Update processing state
 
 After processing each chunk, update the state file:
 ```
 write_file(path="workspace/knowledge/.processing-state.json", content=<updated_state>)
 ```
 
-### Step 8: Continue or stop
-
-If there are more messages to process (remaining > 0), continue with the next chunk.
-If done, provide a summary of what was extracted.
-
-## Processing State Format
-
+State format:
 ```json
 {
   "sessions": {
@@ -100,45 +101,26 @@ If done, provide a summary of what was extracted.
 }
 ```
 
-## Entry File Format
+### Step 7: Continue or stop
 
-```markdown
----
-type: topic
-created: 2025-01-15
-updated: 2025-02-10
-related: [people/alice, decisions/2024-03-use-litellm]
-tags: [architecture, backend]
----
-# Authentication System
-
-## Summary
-OAuth2-based auth with JWT tokens...
-
-## Details
-Full content here.
-
-## Evolution
-- 2025-01-15: Initial design discussion
-- 2025-02-10: Switched from session cookies to JWT
-```
+If there are more messages to process (remaining > 0), continue with the next chunk.
+If done, provide a summary of what was extracted.
 
 ## Guidelines
 
 - Be selective: not every message contains knowledge worth extracting
 - Merge related information into single, comprehensive entries
 - Prefer updating existing entries over creating near-duplicates
-- Keep INDEX.md entries to one line each
-- Cross-reference related entries using the `related` field
-- Include timestamps in the Evolution section for significant changes
-- When in doubt about categorization, prefer `topics/` as the default
-- Facts should be concrete and verifiable (server IPs, versions, configs)
-- Preferences capture how the user likes things done, not what they discussed
+- Don't duplicate information across outputs — use the right one:
+  - Knowledge base for structured, topic-organized, long-lived information
+  - MEMORY.md for facts the agent needs every turn (keep it small)
+  - Daily notes for chronological record of what happened when
+- When in doubt about knowledge category, prefer `topics/` as the default
 
 ## Spawning This Task
 
 The main agent can trigger processing by spawning a subagent:
 
 ```
-spawn(task="Process conversation history for session telegram:12345. Read the knowledge-extractor skill at workspace/skills/knowledge-extractor/SKILL.md and follow the workflow to extract knowledge from unprocessed messages.", label="knowledge extraction")
+spawn(task="Process conversation history for session <session_key>. Read the knowledge-extractor skill at workspace/skills/knowledge-extractor/SKILL.md and follow the workflow.", label="knowledge extraction")
 ```
