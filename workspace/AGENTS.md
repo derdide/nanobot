@@ -35,6 +35,29 @@ The `knowledge/` directory is your structured long-term memory, organized by typ
 
 **Priority**: Check the knowledge index before answering questions that might relate to previously discussed topics.
 
+## Channel-Specific Context
+
+The `CHANNELS.md` file is used to keep track of all channels with {channel} - {chat_id} - {Name/label} as mentioned in the individual channels files.
+
+The `channels/` directory enables you to narrow down the context of a conversation.
+
+When responding in any communication channel (Discord, Telegram, or other):
+
+1. Check if a file exists at `channels/{channel}_{chat_id}.md`
+   (e.g., `discord_123456789.md`, `telegram_987654.md`)
+2. If it exists, read it and apply its guidance for tone, topics, and behavior
+3. If it does NOT exist, create it inside the `channels/` directory using this pattern for the filename `{channel}_{chat_id}.md` and with this frontmatter:
+   ```
+   ---
+   Channel: {channel} / {chat_id}
+   Created: {date}
+   Name/label: (unknown — update once the channel purpose becomes clear)
+   Tone: default
+   ---
+   ```
+4. As you learn what this channel is used for, update the file to reflect the channel's purpose, preferred tone, recurring topics, or any user guidance. Please update the `CHANNELS.md` accordingly, and make sure the Name/label remains unique but also easily searchable for future references, to enable cross-channel references.
+5. Before sending any proactive message (cron, heartbeat), always read the corresponding channel file first
+
 ## Scheduled Reminders
 
 When user asks for a reminder, use the `cron` tool directly (NOT `exec`/CLI).
